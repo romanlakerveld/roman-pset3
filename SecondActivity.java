@@ -22,17 +22,20 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity {
+public class SecondActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        RequestQueue queue = Volley.newRequestQueue(this);
+        setContentView(R.layout.activity_second);
+
+        Intent intent = getIntent();
+
+        String choice = intent.getStringExtra("choice");
+        final ListView listView = (ListView) findViewById(R.id.itemList);
         final List<String> list = new ArrayList<String>();
-        final ListView listView = (ListView) findViewById(R.id.catList);
-        String url = "https://resto.mprog.nl/categories";
-        // Request a string response from the provided URL.
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "https://resto.mprog.nl/menu?category=" + choice;
         StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
                     @Override
@@ -46,14 +49,14 @@ public class MainActivity extends AppCompatActivity {
                         }
                         JSONArray jArray = null;
                         try {
-                            jArray = jsonObject.getJSONArray("categories");
+                            jArray = jsonObject.getJSONArray("items");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
                         for(int i = 0; i < jArray.length(); i++){
                             String itemname = null;
                             try {
-                                itemname = jArray.getString(i);
+                                itemname = jArray.getJSONObject(i).getString("name");
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -61,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
                             ArrayAdapter<String> adapter =
                                     new ArrayAdapter<String>(
-                                            MainActivity.this,
+                                            SecondActivity.this,
                                             android.R.layout.simple_list_item_1,
                                             list);
                             listView.setAdapter(adapter);
@@ -76,19 +79,13 @@ public class MainActivity extends AppCompatActivity {
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
-        {
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> adapter, View v, int position,
-                                    long arg3)
-            {
-                String value = (String)adapter.getItemAtPosition(position);
-                Intent intent = new Intent(MainActivity.this, SecondActivity.class);
-                intent.putExtra("choice", value);
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                String value = (String)adapterView.getItemAtPosition(i);
 
-                startActivity(intent);
-                finish();
             }
         });
     }
+
 }
