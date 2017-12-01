@@ -105,10 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-
-
         final List<String> list = new ArrayList<String>();
         final ListView listView = (ListView) findViewById(R.id.catList);
         String url1 = "https://resto.mprog.nl/categories";
